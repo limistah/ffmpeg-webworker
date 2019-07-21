@@ -8,6 +8,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
@@ -32,14 +34,73 @@ function (_EventEmitter) {
   /**
    * @type {Blob}
    */
+
+  /**
+   * @type {Boolean}
+   */
   function FFMPEGWebworkerClient() {
     var _this;
 
     _classCallCheck(this, FFMPEGWebworkerClient);
 
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(FFMPEGWebworkerClient).call(this));
+
+    _defineProperty(_assertThisInitialized(_this), "_worker", {});
+
+    _defineProperty(_assertThisInitialized(_this), "_inputFile", {});
+
+    _defineProperty(_assertThisInitialized(_this), "workerIsReady", false);
+
+    _defineProperty(_assertThisInitialized(_this), "readFileAsBufferArray", function (file) {
+      return new Promise(function (resolve, reject) {
+        var fileReader = new FileReader();
+
+        fileReader.onload = function () {
+          resolve(this.result);
+        };
+
+        fileReader.onerror = function () {
+          reject(this.error);
+        };
+
+        fileReader.readAsArrayBuffer(file);
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "runCommand", function (command) {
+      if (typeof command !== "string" || !command.length) {
+        throw new Error("command should be string and not empty");
+      }
+
+      _this.convertInputFileToArrayBuffer().then(function (arrayBuffer) {
+        while (!_this.workerIsReady) {}
+
+        var filename = "video.webm";
+        var inputCommand = "-i ".concat(filename, " ").concat(command);
+
+        _this.worker.postMessage({
+          type: "command",
+          arguments: inputCommand.split(" "),
+          files: [{
+            data: new Uint8Array(arrayBuffer),
+            name: filename
+          }]
+        });
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "log", function (message) {
+      return Array.isArray(message) ? console.log.call(null, message) : console.log(message);
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "isVideo", function (file) {
+      var fileType = file.type;
+      return file instanceof Blob && (fileType.includes("video") || fileType.includes("audio"));
+    });
+
     _this.initWebWorker();
 
-    return _possibleConstructorReturn(_this);
+    return _this;
   }
 
   _createClass(FFMPEGWebworkerClient, [{
@@ -54,6 +115,8 @@ function (_EventEmitter) {
 
         if (message.type == "ready") {
           _this2.emit("onReady", "ffmpeg-asm.js file has been loaded.");
+
+          _this2.workerIsReady = true;
         } else if (message.type == "stdout") {
           _this2.emit("onStdout", message.data);
         } else if (message.type == "start") {
@@ -76,7 +139,7 @@ function (_EventEmitter) {
     key: "inputFileExists",
     value: function inputFileExists() {
       var inputFile = this.inputFile;
-      return inputFile && inputFile instanceof Blob && inputFile.size && inputFile.type;
+      return !!(inputFile && inputFile instanceof Blob && inputFile.size && inputFile.type);
     }
     /**
      * use worker to encode audio
@@ -87,7 +150,7 @@ function (_EventEmitter) {
   }, {
     key: "convertInputFileToArrayBuffer",
     value: function convertInputFileToArrayBuffer() {
-      if (!this.inputFileExists) {
+      if (!this.inputFileExists()) {
         throw new Error("Input File has not been set");
       }
 

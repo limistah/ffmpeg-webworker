@@ -3,7 +3,7 @@ const { createConfig, babel, css } = require("webpack-blocks");
 
 module.exports = {
   title: "ffmpeg-webworker",
-  styleguideDir: path.join(__dirname, "styleguide"),
+  styleguideDir: path.join(__dirname, "docs"),
   webpackConfig: createConfig([babel(), css()]),
   exampleMode: "expand",
   usageMode: "expand",
