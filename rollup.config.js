@@ -2,6 +2,8 @@ import babel from "rollup-plugin-babel";
 import resolve from "rollup-plugin-node-resolve";
 import commonjs from "rollup-plugin-commonjs";
 import { uglify } from "rollup-plugin-uglify";
+import builtins from "rollup-plugin-node-builtins";
+import globals from "rollup-plugin-node-globals";
 
 const umdGlobals = {
   Blob: "Blob",
@@ -24,7 +26,9 @@ export default {
     babel({
       exclude: "node_modules/**"
     }),
-    resolve(),
+    resolve({ preferBuiltins: true }),
+    globals(),
+    builtins(),
     commonjs(),
     uglify()
   ]
