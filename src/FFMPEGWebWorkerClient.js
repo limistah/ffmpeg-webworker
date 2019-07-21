@@ -11,7 +11,13 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
    * @type {Blob}
    */
   _inputFile = {};
+
+  /**
+   * @type {Boolean}
+   */
+  workerIsReady = false;
   constructor() {
+    super();
     this.initWebWorker();
   }
 
@@ -21,6 +27,7 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
       let message = event.data;
       if (message.type == "ready") {
         this.emit("onReady", "ffmpeg-asm.js file has been loaded.");
+        this.workerIsReady = true;
       } else if (message.type == "stdout") {
         this.emit("onStdout", message.data);
       } else if (message.type == "start") {
@@ -76,8 +83,11 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
 
   inputFileExists() {
     const inputFile = this.inputFile;
-    return (
-      inputFile && inputFile instanceof Blob && inputFile.size && inputFile.type
+    return !!(
+      inputFile &&
+      inputFile instanceof Blob &&
+      inputFile.size &&
+      inputFile.type
     );
   }
 
@@ -87,7 +97,7 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
    * @return {Promise<ArrayBuffer>}
    */
   convertInputFileToArrayBuffer() {
-    if (!this.inputFileExists) {
+    if (!this.inputFileExists()) {
       throw new Error("Input File has not been set");
     }
     return this.readFileAsBufferArray(this.inputFile);
@@ -100,7 +110,8 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
     if (typeof command !== "string" || !command.length) {
       throw new Error("command should be string and not empty");
     }
-    this.convertInputFileToArrayBuffer(arrayBuffer => {
+    this.convertInputFileToArrayBuffer().then(arrayBuffer => {
+      while (!this.workerIsReady) {}
       const filename = "video.webm";
       const inputCommand = `-i ${filename} ${command}`;
       this.worker.postMessage({

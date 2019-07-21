@@ -2,7 +2,7 @@ const path = require("path");
 const { createConfig, babel, css } = require("webpack-blocks");
 
 module.exports = {
-  title: "webworker-file",
+  title: "ffmpeg-webworker",
   styleguideDir: path.join(__dirname, "styleguide"),
   webpackConfig: createConfig([babel(), css()]),
   exampleMode: "expand",
@@ -10,7 +10,7 @@ module.exports = {
   showSidebar: false,
   serverPort: 8080,
   moduleAliases: {
-    "webworker-file": path.resolve(__dirname, "./src")
+    "ffmpeg-webworker": path.resolve(__dirname, "./src")
   },
   require: [path.join(__dirname, "examples/theme.css")],
   sections: [

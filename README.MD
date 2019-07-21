@@ -1,6 +1,6 @@
 # ffmpeg-webworker
 
-Initialize imported web worker files with ease
+A WebWorker implementation that eases the use of ffmpeg library in the browser.
 
 ## Installation
 
@@ -16,31 +16,59 @@ yarn add ffmpeg-webworker
 
 ## Usage
 
-```js static
-// workerFile.js
-const worker = function() {
-  postMessage({ type: "ready" });
-  // File to import will be downloaded, ensure that the path is relative to the server address
-  const scriptPath = "https://archive.org/download/ffmpeg_asm/ffmpeg_asm.js";
-  importScripts(scriptPath);
-  onmessage = function(event) {
-    postMessage({ type: "stdout", data: {} });
-  };
+```js
+import workerClient from "ffmpeg-webworker";
+import React from "react";
+
+workerClient.on("onReady", () => console.log("Ready"));
+workerClient.on("onStdout", msg => console.log("StdOut: ", msg));
+workerClient.on("onFileReceived", msg => console.log("File Received"));
+workerClient.on("onDone", data => console.log("Command Done: ", data));
+
+const handleInputChange = React.useCallback(async e => {
+  const file = e.currentTarget.files[0];
+  // Set the file for processing
+  workerClient.inputFile = file;
+  // Run a valid ffmpeg command
+  workerClient.runCommand("-ss 00:00:05 -c copy -t 12 sliced-output.mp4");
+});
+const Input = () => {
+  return (
+    <input type="file" accept="audio/*,video/*" onChange={handleInputChange} />
+  );
 };
-export default worker;
+<Input />;
 ```
 
 ```js static
-import WorkerFile from "ffmpeg-webworker";
-import workerFile from "./workerFile";
+import workerClient from "ffmpeg-webworker";
+import React from "react";
 
-const worker = new WorkerFile(workerFile);
-worker.onmessage = function(e) {
-  // ...
-  console.log(e);
+workerClient.on("onReady", () => console.log("Ready"));
+workerClient.on("onStdout", msg => console.log("StdOut: ", msg));
+workerClient.on("onFileReceived", msg => console.log("File Received"));
+workerClient.on("onDone", data => console.log("Command Done: ", data));
+
+const handleInputChange = React.useCallback(async e => {
+  const file = e.currentTarget.files[0];
+  // Set the file for processing
+  workerClient.inputFile = file;
+  // Run a valid ffmpeg command
+  workerClient.runCommand("-ss 00:00:05 -c copy -t 12 sliced-output.mp4");
+});
+const Input = () => {
+  return (
+    <input type="file" accept="audio/*,video/*" onChange={handleInputChange} />
+  );
 };
+<Input />;
 ```
 
 ## License
 
 MIT
+
+## Credits
+
+This library has been made possible with the awesome work by folks at
+[Ffmpeg.js](https://github.com/muaz-khan/Ffmpeg.js/)
