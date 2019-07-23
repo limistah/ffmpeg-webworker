@@ -4,7 +4,9 @@ export var FFMPEGWebworker = Webworker;
 export var FFMPEGWebworkerClient = WebworkerClient;
 var workerClient = WebworkerClient;
 
-if (window && window.Blob) {
+var _window = global || window;
+
+if (_window && _window.Blob) {
   workerClient = new WebworkerClient();
 }
 
