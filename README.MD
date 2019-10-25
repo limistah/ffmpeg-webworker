@@ -32,7 +32,8 @@ class FFMPEG extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      stdOutputText: ""
+      stdOutputText: "",
+      ffmpegReady: false
     };
 
     this.updateStdOutputText = this.updateStdOutputText.bind(this);
@@ -41,15 +42,11 @@ class FFMPEG extends React.Component {
   }
 
   componentWillMount() {
-    workerClient.on("onReady", () =>
-      // this.updateStdOutputText("FFMPEG is ready")
-      console.log("FFMPEG Ready")
-    );
+    workerClient.on("onReady", () => this.setState({ ffmpegReady: true }));
     workerClient.on("onStdout", msg => this.updateStdOutputText(msg));
     workerClient.on("onFileReceived", msg => this.updateStdOutputText(msg));
     workerClient.on("onDone", data => {
       this.updateStdOutputText("Command Completed, check the console");
-      console.log(data);
     });
   }
 
@@ -75,8 +72,13 @@ class FFMPEG extends React.Component {
     );
   }
 
-  StdOutput({ text }) {
-    return <pre>{text}</pre>;
+  StdOutput({ text, ffmpegReady }) {
+    return (
+      <pre>
+        {ffmpegReady ? "FFMPEG is ready" : "Loading FFMPEG"}
+        {text}
+      </pre>
+    );
   }
 
   handleListCodecs(e) {
@@ -91,7 +93,10 @@ class FFMPEG extends React.Component {
       <div>
         {<this.Input onChange={this.handleInputChange} />}
         <button onClick={this.handleListCodecs}>List Codecs</button>
-        <this.StdOutput text={this.state.stdOutputText} />
+        <this.StdOutput
+          text={this.state.stdOutputText}
+          ffmpegReady={this.state.ffmpegReady}
+        />
       </div>
     );
   }
@@ -112,11 +117,12 @@ It supports the following properties:
 
 Receives an event from the ffmpeg webworker. Below are the supported commands:
 
-- _ready_: The webworker has loaded ffmpeg successfully.
-- _stdout_: Listens to standard ffmpeg-js message outputs.
-- _start_: Command has been received and started.
-- _done_: Command has been completed. Receives the data from ffmpeg as the first
-  parameter.
+- _onReady_: The webworker has loaded ffmpeg successfully.
+- _onStdout_: Listens to standard ffmpeg-js message outputs.
+- _onStart_: Command has been received and started.
+- _onDone_: Command has been completed. Receives the data from ffmpeg as the
+  first parameter.
+- _onFileReceived_: Input file has been set on the client.
 
 ### workerClient.inputFile : File
 

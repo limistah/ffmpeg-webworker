@@ -23,9 +23,8 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
 
   initWebWorker() {
     this.worker = new WorkerFile(workerFile);
-    console.log(this.worker);
-    this.worker.onmessage = event => {
-      console.log(message);
+    this.log;
+    const log = (this.worker.onmessage = event => {
       let message = event.data;
       if (message.type == "ready") {
         this.emit("onReady", "ffmpeg-asm.js file has been loaded.");
@@ -38,7 +37,7 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
       } else if (message.type == "done") {
         this.emit("onDone", message.data);
       }
-    };
+    });
   }
 
   set worker(worker) {
@@ -105,7 +104,7 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
     if (typeof command !== "string" || !command.length) {
       throw new Error("command should be string and not empty");
     }
-    if (this.inputFile) {
+    if (this.inputFile && this.inputFile.type) {
       this.convertInputFileToArrayBuffer().then(arrayBuffer => {
         while (!this.workerIsReady) {}
         const filename = "video.webm";
@@ -124,13 +123,7 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
     } else {
       this.worker.postMessage({
         type: "command",
-        arguments: inputCommand.split(" "),
-        files: [
-          {
-            data: new Uint8Array(arrayBuffer),
-            name: filename
-          }
-        ]
+        arguments: command.split(" ")
       });
     }
   };
