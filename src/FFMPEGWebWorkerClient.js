@@ -102,14 +102,26 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
    * @param {String} command
    */
   runCommand = command => {
-    console.log(command);
     if (typeof command !== "string" || !command.length) {
       throw new Error("command should be string and not empty");
     }
-    this.convertInputFileToArrayBuffer().then(arrayBuffer => {
-      while (!this.workerIsReady) {}
-      const filename = "video.webm";
-      const inputCommand = `-i ${filename} ${command}`;
+    if (this.inputFile) {
+      this.convertInputFileToArrayBuffer().then(arrayBuffer => {
+        while (!this.workerIsReady) {}
+        const filename = "video.webm";
+        const inputCommand = `-i ${filename} ${command}`;
+        this.worker.postMessage({
+          type: "command",
+          arguments: inputCommand.split(" "),
+          files: [
+            {
+              data: new Uint8Array(arrayBuffer),
+              name: filename
+            }
+          ]
+        });
+      });
+    } else {
       this.worker.postMessage({
         type: "command",
         arguments: inputCommand.split(" "),
@@ -120,7 +132,7 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
           }
         ]
       });
-    });
+    }
   };
 
   /**
