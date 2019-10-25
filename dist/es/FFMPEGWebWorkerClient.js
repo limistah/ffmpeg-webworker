@@ -121,18 +121,20 @@ function (_EventEmitter) {
       var log = this.worker.onmessage = function (event) {
         var message = event.data;
 
-        if (message.type == "ready") {
-          _this2.emit("onReady", "ffmpeg-asm.js file has been loaded.");
+        if (event && event.type) {
+          if (message.type == "ready") {
+            _this2.emit("onReady", "ffmpeg-asm.js file has been loaded.");
 
-          _this2.workerIsReady = true;
-        } else if (message.type == "stdout") {
-          _this2.emit("onStdout", message.data);
-        } else if (message.type == "start") {
-          _this2.emit("onFileReceived", "File Received");
+            _this2.workerIsReady = true;
+          } else if (message.type == "stdout") {
+            _this2.emit("onStdout", message.data);
+          } else if (message.type == "start") {
+            _this2.emit("onFileReceived", "File Received");
 
-          log("file received ffmpeg command.");
-        } else if (message.type == "done") {
-          _this2.emit("onDone", message.data);
+            log("file received ffmpeg command.");
+          } else if (message.type == "done") {
+            _this2.emit("onDone", message.data);
+          }
         }
       };
     }
