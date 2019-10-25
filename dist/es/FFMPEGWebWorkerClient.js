@@ -68,6 +68,8 @@ function (_EventEmitter) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "runCommand", function (command) {
+      console.log(command);
+
       if (typeof command !== "string" || !command.length) {
         throw new Error("command should be string and not empty");
       }
@@ -109,8 +111,10 @@ function (_EventEmitter) {
       var _this2 = this;
 
       this.worker = new WorkerFile(workerFile);
+      console.log(this.worker);
 
       this.worker.onmessage = function (event) {
+        console.log(message);
         var message = event.data;
 
         if (message.type == "ready") {
@@ -124,14 +128,7 @@ function (_EventEmitter) {
 
           log("file received ffmpeg command.");
         } else if (message.type == "done") {
-          _this2.emit("onDone", message.data); // const result = message.data[0];
-          // log(JSON.stringify(result));
-          // const blob = new File([result.data], "test.mp4", {
-          //   type: "video/mp4"
-          // });
-          // // log(blob);
-          // resolve(blob);
-
+          _this2.emit("onDone", message.data);
         }
       };
     }

@@ -1,5 +1,5 @@
 var workerFile = function workerFile() {
-  var workerPath = "https://web.archive.org/web/20180728111127/https://bgrins.github.io/videoconverter.js/build/ffmpeg-all-codecs.js";
+  var workerPath = "https://cdn.rawgit.com/bgrins/videoconverter.js/master/build/ffmpeg-all-codecs.js";
   importScripts(workerPath);
   var now = Date.now;
 
