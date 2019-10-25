@@ -47,6 +47,7 @@ class FFMPEG extends React.Component {
     workerClient.on("onFileReceived", msg => this.updateStdOutputText(msg));
     workerClient.on("onDone", data => {
       this.updateStdOutputText("Command Completed, check the console");
+      console.log(data);
     });
   }
 

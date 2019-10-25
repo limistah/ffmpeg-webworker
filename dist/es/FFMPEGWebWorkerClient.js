@@ -68,27 +68,32 @@ function (_EventEmitter) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "runCommand", function (command) {
-      console.log(command);
-
       if (typeof command !== "string" || !command.length) {
         throw new Error("command should be string and not empty");
       }
 
-      _this.convertInputFileToArrayBuffer().then(function (arrayBuffer) {
-        while (!_this.workerIsReady) {}
+      if (_this.inputFile && _this.inputFile.type) {
+        _this.convertInputFileToArrayBuffer().then(function (arrayBuffer) {
+          while (!_this.workerIsReady) {}
 
-        var filename = "video.webm";
-        var inputCommand = "-i ".concat(filename, " ").concat(command);
+          var filename = "video.webm";
+          var inputCommand = "-i ".concat(filename, " ").concat(command);
 
+          _this.worker.postMessage({
+            type: "command",
+            arguments: inputCommand.split(" "),
+            files: [{
+              data: new Uint8Array(arrayBuffer),
+              name: filename
+            }]
+          });
+        });
+      } else {
         _this.worker.postMessage({
           type: "command",
-          arguments: inputCommand.split(" "),
-          files: [{
-            data: new Uint8Array(arrayBuffer),
-            name: filename
-          }]
+          arguments: command.split(" ")
         });
-      });
+      }
     });
 
     _defineProperty(_assertThisInitialized(_this), "log", function (message) {
@@ -111,10 +116,9 @@ function (_EventEmitter) {
       var _this2 = this;
 
       this.worker = new WorkerFile(workerFile);
-      console.log(this.worker);
+      this.log;
 
-      this.worker.onmessage = function (event) {
-        console.log(message);
+      var log = this.worker.onmessage = function (event) {
         var message = event.data;
 
         if (message.type == "ready") {

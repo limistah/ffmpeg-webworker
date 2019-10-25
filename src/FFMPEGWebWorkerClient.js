@@ -26,16 +26,18 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
     this.log;
     const log = (this.worker.onmessage = event => {
       let message = event.data;
-      if (message.type == "ready") {
-        this.emit("onReady", "ffmpeg-asm.js file has been loaded.");
-        this.workerIsReady = true;
-      } else if (message.type == "stdout") {
-        this.emit("onStdout", message.data);
-      } else if (message.type == "start") {
-        this.emit("onFileReceived", "File Received");
-        log("file received ffmpeg command.");
-      } else if (message.type == "done") {
-        this.emit("onDone", message.data);
+      if (event && event.type) {
+        if (message.type == "ready") {
+          this.emit("onReady", "ffmpeg-asm.js file has been loaded.");
+          this.workerIsReady = true;
+        } else if (message.type == "stdout") {
+          this.emit("onStdout", message.data);
+        } else if (message.type == "start") {
+          this.emit("onFileReceived", "File Received");
+          log("file received ffmpeg command.");
+        } else if (message.type == "done") {
+          this.emit("onDone", message.data);
+        }
       }
     });
   }
