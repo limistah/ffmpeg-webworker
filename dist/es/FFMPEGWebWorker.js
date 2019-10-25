@@ -1,5 +1,5 @@
 var workerFile = function workerFile() {
-  var workerPath = "https://archive.org/download/ffmpeg_asm/ffmpeg_asm.js";
+  var workerPath = "https://web.archive.org/web/20180728111127/https://bgrins.github.io/videoconverter.js/build/ffmpeg-all-codecs.js";
   importScripts(workerPath);
   var now = Date.now;
 

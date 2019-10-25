@@ -23,7 +23,9 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
 
   initWebWorker() {
     this.worker = new WorkerFile(workerFile);
+    console.log(this.worker);
     this.worker.onmessage = event => {
+      console.log(message);
       let message = event.data;
       if (message.type == "ready") {
         this.emit("onReady", "ffmpeg-asm.js file has been loaded.");
@@ -35,13 +37,6 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
         log("file received ffmpeg command.");
       } else if (message.type == "done") {
         this.emit("onDone", message.data);
-        // const result = message.data[0];
-        // log(JSON.stringify(result));
-        // const blob = new File([result.data], "test.mp4", {
-        //   type: "video/mp4"
-        // });
-        // // log(blob);
-        // resolve(blob);
       }
     };
   }
@@ -107,6 +102,7 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
    * @param {String} command
    */
   runCommand = command => {
+    console.log(command);
     if (typeof command !== "string" || !command.length) {
       throw new Error("command should be string and not empty");
     }

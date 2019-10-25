@@ -1,5 +1,7 @@
 const workerFile = () => {
-  const workerPath = "https://archive.org/download/ffmpeg_asm/ffmpeg_asm.js";
+  const workerPath =
+    "https://cdn.rawgit.com/bgrins/videoconverter.js/master/build/ffmpeg-all-codecs.js";
+
   importScripts(workerPath);
   const now = Date.now;
   function print(text) {
