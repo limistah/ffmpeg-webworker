@@ -102,7 +102,7 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
   /**
    * @param {String} command
    */
-  runCommand = (command, totalMemory = 33554432) => {
+  runCommand = (command, totalMemory) => {
     if (typeof command !== "string" || !command.length) {
       throw new Error("command should be string and not empty");
     }
