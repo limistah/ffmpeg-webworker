@@ -19,7 +19,7 @@ var workerFile = function workerFile() {
         printErr: print,
         files: message.files || [],
         arguments: message.arguments || [],
-        TOTAL_MEMORY: message.totalMemory || 33554432
+        TOTAL_MEMORY: message.totalMemory || null
       };
       postMessage({
         type: "start",
