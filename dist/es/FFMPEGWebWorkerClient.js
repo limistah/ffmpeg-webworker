@@ -78,7 +78,7 @@ function (_EventEmitter) {
         _this.convertInputFileToArrayBuffer().then(function (arrayBuffer) {
           while (!_this.workerIsReady) {}
 
-          var filename = "video.webm";
+          var filename = "video-".concat(Date.now(), ".webm");
           var inputCommand = "-i ".concat(filename, " ").concat(command);
 
           _this.worker.postMessage({
