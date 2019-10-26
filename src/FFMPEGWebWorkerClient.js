@@ -102,7 +102,7 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
   /**
    * @param {String} command
    */
-  runCommand = command => {
+  runCommand = (command, totalMemory = 33554432) => {
     if (typeof command !== "string" || !command.length) {
       throw new Error("command should be string and not empty");
     }
@@ -118,14 +118,16 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
             {
               data: new Uint8Array(arrayBuffer),
               name: filename
-            }
+            },
+            totalMemory
           ]
         });
       });
     } else {
       this.worker.postMessage({
         type: "command",
-        arguments: command.split(" ")
+        arguments: command.split(" "),
+        totalMemory
       });
     }
   };

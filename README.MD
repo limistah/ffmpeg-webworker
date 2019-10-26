@@ -145,7 +145,7 @@ Detects if the inputFile has been passed in correctly.
 
 Converts already set input file in the library to Buffer Array for processing
 
-### workerClient.runCommand (command: String) : void
+### workerClient.runCommand (command: String, totalMemory = 33554432: Number) : void
 
 Accepts a valid ffmpeg command to be run against the input file
 
