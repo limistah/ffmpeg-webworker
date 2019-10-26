@@ -68,6 +68,8 @@ function (_EventEmitter) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "runCommand", function (command) {
+      var totalMemory = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 33554432;
+
       if (typeof command !== "string" || !command.length) {
         throw new Error("command should be string and not empty");
       }
@@ -85,13 +87,14 @@ function (_EventEmitter) {
             files: [{
               data: new Uint8Array(arrayBuffer),
               name: filename
-            }]
+            }, totalMemory]
           });
         });
       } else {
         _this.worker.postMessage({
           type: "command",
-          arguments: command.split(" ")
+          arguments: command.split(" "),
+          totalMemory: totalMemory
         });
       }
     });
