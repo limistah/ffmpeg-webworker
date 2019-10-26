@@ -109,7 +109,7 @@ export default class FFMPEGWebworkerClient extends EventEmitter {
     if (this.inputFile && this.inputFile.type) {
       this.convertInputFileToArrayBuffer().then(arrayBuffer => {
         while (!this.workerIsReady) {}
-        const filename = "video.webm";
+        const filename = `video-${Date.now()}.webm`;
         const inputCommand = `-i ${filename} ${command}`;
         this.worker.postMessage({
           type: "command",
