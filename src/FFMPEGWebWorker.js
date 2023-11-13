@@ -1,6 +1,6 @@
 const workerFile = () => {
   const workerPath =
-    "https://cdn.rawgit.com/bgrins/videoconverter.js/master/build/ffmpeg-all-codecs.js";
+    "https://raw.githubusercontent.com/bgrins/videoconverter.js/master/build/ffmpeg-all-codecs.js";
 
   importScripts(workerPath);
   const now = Date.now;
